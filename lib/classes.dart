@@ -1,4 +1,8 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
+import 'dart:io';
 
 class NavPage {
   final String label;
@@ -7,6 +11,56 @@ class NavPage {
   final Widget page;
 
   const NavPage(this.label, this.icon, this.selectedIcon, this.page);
+}
+
+class Device {
+  static const _storage = FlutterSecureStorage();
+
+  final String id;
+  final String browser;
+  final String os;
+
+  const Device({required this.id, required this.browser, required this.os});
+
+  /// Create a Device object from the actual device info
+  static Future<Device> getData() async {
+    final deviceInfo = DeviceInfoPlugin();
+
+    // Load or generate device ID
+    String? deviceId = await _storage.read(key: 'device_id');
+    if (deviceId == null) {
+      deviceId = const Uuid().v4();
+      await _storage.write(key: 'device_id', value: deviceId);
+    }
+
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      return Device(
+        id: deviceId,
+        os: 'Android ${androidInfo.version.release}',
+        browser: '${androidInfo.brand} ${androidInfo.model}',
+      );
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      return Device(
+        id: deviceId,
+        os: 'iOS ${iosInfo.systemVersion}',
+        browser: iosInfo.utsname.machine, // or iosInfo.name for user-friendly
+      );
+    } else {
+      return Device(id: deviceId, os: 'Unknown', browser: 'Unknown');
+    }
+  }
+
+  factory Device.fromJson(Map<String, dynamic> json) {
+    return Device(
+      id: json['id'] as String,
+      browser: json['browser'] as String,
+      os: json['os'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'browser': browser, 'os': os};
 }
 
 class AuthData {
@@ -194,5 +248,65 @@ class ContactData {
     'lastName': lastName,
     'blocked': blocked,
     'profile': profile.toJson(),
+  };
+}
+
+class MessageData {
+  final String id;
+  final DateTime? createdAt;
+  final String senderId;
+  final String? content;
+  final String statusId;
+
+  const MessageData({
+    required this.id,
+    this.createdAt,
+    required this.senderId,
+    this.content,
+    required this.statusId,
+  });
+
+  factory MessageData.fromJson(Map<String, dynamic> json) {
+    return MessageData(
+      id: json['id'] as String,
+      createdAt: DateTime.parse(json['id']),
+      senderId: json['senderId'] as String,
+      content: json['content'] as String,
+      statusId: json['statusId'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'createdAt': createdAt,
+    'senderId': senderId,
+    'content': content,
+    'statusId': statusId,
+  };
+}
+
+class DisplayChatData {
+  final String id;
+  final MessageData lastMessage;
+  final ProfileData partner;
+
+  const DisplayChatData({
+    required this.id,
+    required this.lastMessage,
+    required this.partner,
+  });
+
+  factory DisplayChatData.fromJson(Map<String, dynamic> json) {
+    return DisplayChatData(
+      id: json['id'] as String,
+      lastMessage: MessageData.fromJson(json['lastMessage']),
+      partner: ProfileData.fromJson(json['partner']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'lastMessage': lastMessage,
+    'partner': partner,
   };
 }

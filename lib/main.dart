@@ -9,7 +9,7 @@ void main() {
 class Fang extends StatelessWidget {
   const Fang({super.key});
 
-  // This widget is the root of your application.
+  // This widget is the root of your application.HomePage
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +20,7 @@ class Fang extends StatelessWidget {
         ).apply(bodyColor: Colors.white, displayColor: Colors.white),
       ),
       title: 'Kurama',
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }
