@@ -58,6 +58,22 @@ class AuthStorage {
     return sessionId;
   }
 
+  static Future<void> saveAccountId(String accountId) async {
+    await _storage.write(key: 'accountId', value: accountId);
+  }
+
+  static Future<String?> getAccountId() async {
+    return await _storage.read(key: 'accountId');
+  }
+
+  static Future<void> saveProfileId(String profileId) async {
+    await _storage.write(key: 'profileId', value: profileId);
+  }
+
+  static Future<String?> getProfileId() async {
+    return await _storage.read(key: 'profileId');
+  }
+
   static Future<void> clear() async {
     await _storage.deleteAll();
   }

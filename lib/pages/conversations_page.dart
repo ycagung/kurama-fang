@@ -1,36 +1,8 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:fang/classes.dart';
+import 'package:fang/components/chat/chat_list_item.dart';
+import 'package:fang/pages/chat/chat_page.dart';
+import 'package:fang/services/chat_service.dart';
+import 'package:fang/storage/auth_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-Future<List<DisplayChatData>> fetchChats() async {
-  final response = await http.get(
-    Uri.parse(
-      'http://localhost:5000/chat/personal?profileId=ec4d20db-e552-427f-8ad8-94c8f19c9592',
-    ),
-    headers: <String, String>{'Content-Type': 'application/json'},
-    // body: jsonEncode(<String, String>{
-    //   'profileId': 'ec4d20db-e552-427f-8ad8-94c8f19c9592',
-    // }),
-  );
-
-  if (response.statusCode == 200) {
-    List<Map<String, dynamic>> parsed = jsonDecode(response.body);
-    List<DisplayChatData> chats = [];
-
-    for (var obj in parsed) {
-      chats.add(DisplayChatData.fromJson(obj));
-    }
-
-    print(chats);
-
-    return chats;
-  } else {
-    throw Exception('Failed to fetch chats');
-  }
-}
 
 class ConversationsPage extends StatefulWidget {
   const ConversationsPage({super.key});
@@ -40,12 +12,49 @@ class ConversationsPage extends StatefulWidget {
 }
 
 class _ConversationsPageState extends State<ConversationsPage> {
-  late Future<List<DisplayChatData>>? _chats;
+  final ChatService _chatService = ChatService();
+  String? _currentProfileId;
+  String? _selectedChatId;
+  List<dynamic>? _chats;
 
   @override
   void initState() {
     super.initState();
-    _chats = fetchChats();
+    _loadChats();
+  }
+
+  Future<void> _loadChats() async {
+    final profileId = await AuthStorage.getProfileId();
+    if (profileId == null) return;
+
+    setState(() {
+      _currentProfileId = profileId;
+    });
+
+    try {
+      final chats = await _chatService.getPersonalChats(profileId);
+      setState(() {
+        _chats = chats;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load chats: $e')),
+        );
+      }
+    }
+  }
+
+  void _navigateToChat(String chatId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatPage(chatId: chatId),
+      ),
+    ).then((_) {
+      // Refresh chats when returning from chat page
+      _loadChats();
+    });
   }
 
   @override
@@ -53,78 +62,48 @@ class _ConversationsPageState extends State<ConversationsPage> {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        actionsPadding: EdgeInsets.only(right: 16),
-        title: Container(
-          padding: EdgeInsets.only(left: 4),
-          child: Text('Kurama', style: TextStyle(color: Colors.grey[300])),
+        title: Text(
+          'Conversations',
+          style: TextStyle(color: Colors.grey[300]),
         ),
         actions: [
-          GestureDetector(child: Icon(Icons.search, color: Colors.grey[300])),
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.grey[300]),
+            onPressed: () {
+              // TODO: Implement search
+            },
+          ),
         ],
         backgroundColor: Colors.grey[900],
       ),
       backgroundColor: Colors.grey[900],
-      body: FutureBuilder<List<DisplayChatData>>(
-        future: _chats,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('No data found'));
-          }
-
-          final data = snapshot.data!;
-
-          return ListView.builder(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              final chat = data[index];
-
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                margin: EdgeInsets.symmetric(vertical: 2, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey[800],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 48,
-                      width: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[700],
-                        borderRadius: BorderRadius.circular(50),
+      body: _currentProfileId == null
+          ? const Center(child: CircularProgressIndicator())
+          : _chats == null
+              ? const Center(child: CircularProgressIndicator())
+              : _chats!.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No conversations yet',
+                        style: TextStyle(color: Colors.grey[500]),
                       ),
-                      child: Icon(Icons.person),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            chat.partner.firstName,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            chat.lastMessage.content!,
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                        ],
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadChats,
+                      color: Colors.grey[300],
+                      child: ListView.builder(
+                        itemCount: _chats!.length,
+                        itemBuilder: (context, index) {
+                          final chat = _chats![index] as dynamic;
+                          return ChatListItem(
+                            chat: chat,
+                            currentProfileId: _currentProfileId!,
+                            isSelected: _selectedChatId == chat.id,
+                            onTap: () => _navigateToChat(chat.id),
+                          );
+                        },
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
     );
   }
 }

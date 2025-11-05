@@ -269,9 +269,11 @@ class MessageData {
   factory MessageData.fromJson(Map<String, dynamic> json) {
     return MessageData(
       id: json['id'] as String,
-      createdAt: DateTime.parse(json['id']),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
       senderId: json['senderId'] as String,
-      content: json['content'] as String,
+      content: json['content'] as String?,
       statusId: json['statusId'] as String,
     );
   }
@@ -309,4 +311,393 @@ class DisplayChatData {
     'lastMessage': lastMessage,
     'partner': partner,
   };
+}
+
+// --- Generated model classes for additional tables ---
+
+class AccountData {
+  final String id;
+  final DateTime? createdAt;
+  final String email;
+  final String? phoneNumber;
+  final CountryData? country;
+  final String? activeProfileId;
+
+  const AccountData({
+    required this.id,
+    this.createdAt,
+    required this.email,
+    this.phoneNumber,
+    this.country,
+    this.activeProfileId,
+  });
+
+  factory AccountData.fromJson(Map<String, dynamic> json) {
+    return AccountData(
+      id: json['id'] as String,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      email: json['email'] as String,
+      phoneNumber: json['phoneNumber'] as String?,
+      country: json['country'] != null
+          ? CountryData.fromJson(json['country'] as Map<String, dynamic>)
+          : null,
+      activeProfileId: json['activeProfileId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'email': email,
+        'phoneNumber': phoneNumber,
+        'country': country?.toJson(),
+        'activeProfileId': activeProfileId,
+      };
+}
+
+class SessionData {
+  final String id;
+  final DateTime? createdAt;
+  final String accountId;
+  final String lastToken;
+  final DateTime? expiryDate;
+  final bool valid;
+  final String deviceId;
+  final DateTime? endedAt;
+  final String? socketId;
+
+  const SessionData({
+    required this.id,
+    this.createdAt,
+    required this.accountId,
+    required this.lastToken,
+    this.expiryDate,
+    required this.valid,
+    required this.deviceId,
+    this.endedAt,
+    this.socketId,
+  });
+
+  factory SessionData.fromJson(Map<String, dynamic> json) {
+    return SessionData(
+      id: json['id'] as String,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      accountId: json['accountId'] as String,
+      lastToken: json['lastToken'] as String,
+      expiryDate: json['expiryDate'] != null
+          ? DateTime.parse(json['expiryDate'] as String)
+          : null,
+      valid: json['valid'] as bool,
+      deviceId: json['deviceId'] as String,
+      endedAt: json['endedAt'] != null
+          ? DateTime.parse(json['endedAt'] as String)
+          : null,
+      socketId: json['socketId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'accountId': accountId,
+        'lastToken': lastToken,
+        'expiryDate': expiryDate?.toIso8601String(),
+        'valid': valid,
+        'deviceId': deviceId,
+        'endedAt': endedAt?.toIso8601String(),
+        'socketId': socketId,
+      };
+}
+
+class ProfileFlagData {
+  final String id;
+  final String name;
+
+  const ProfileFlagData({required this.id, required this.name});
+
+  factory ProfileFlagData.fromJson(Map<String, dynamic> json) {
+    return ProfileFlagData(id: json['id'] as String, name: json['name'] as String);
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+}
+
+class GroupData {
+  final String id;
+  final DateTime? createdAt;
+  final String name;
+  final String? imgUrl;
+  final String? description;
+
+  const GroupData({
+    required this.id,
+    this.createdAt,
+    required this.name,
+    this.imgUrl,
+    this.description,
+  });
+
+  factory GroupData.fromJson(Map<String, dynamic> json) {
+    return GroupData(
+      id: json['id'] as String,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      name: json['name'] as String,
+      imgUrl: json['imgUrl'] as String?,
+      description: json['description'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'name': name,
+        'imgUrl': imgUrl,
+        'description': description,
+      };
+}
+
+class GroupMemberData {
+  final String id;
+  final DateTime? createdAt;
+  final String groupId;
+  final String profileId;
+  final String roleId;
+
+  const GroupMemberData({
+    required this.id,
+    this.createdAt,
+    required this.groupId,
+    required this.profileId,
+    required this.roleId,
+  });
+
+  factory GroupMemberData.fromJson(Map<String, dynamic> json) {
+    return GroupMemberData(
+      id: json['id'] as String,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      groupId: json['groupId'] as String,
+      profileId: json['profileId'] as String,
+      roleId: json['roleId'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'groupId': groupId,
+        'profileId': profileId,
+        'roleId': roleId,
+      };
+}
+
+class GroupMemberRoleData {
+  final String id;
+  final String name;
+
+  const GroupMemberRoleData({required this.id, required this.name});
+
+  factory GroupMemberRoleData.fromJson(Map<String, dynamic> json) {
+    return GroupMemberRoleData(id: json['id'] as String, name: json['name'] as String);
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+}
+
+class ChatData {
+  final String id;
+  final DateTime? createdAt;
+  final String chatTypeId;
+  final String? groupId;
+
+  const ChatData({
+    required this.id,
+    this.createdAt,
+    required this.chatTypeId,
+    this.groupId,
+  });
+
+  factory ChatData.fromJson(Map<String, dynamic> json) {
+    return ChatData(
+      id: json['id'] as String,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      chatTypeId: json['chatTypeId'] as String,
+      groupId: json['groupId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'chatTypeId': chatTypeId,
+        'groupId': groupId,
+      };
+}
+
+class ChatParticipantData {
+  final String id;
+  final String chatId;
+  final String profileId;
+
+  const ChatParticipantData({required this.id, required this.chatId, required this.profileId});
+
+  factory ChatParticipantData.fromJson(Map<String, dynamic> json) {
+    return ChatParticipantData(
+      id: json['id'] as String,
+      chatId: json['chatId'] as String,
+      profileId: json['profileId'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'chatId': chatId, 'profileId': profileId};
+}
+
+class ChatTypeData {
+  final String id;
+  final String name;
+
+  const ChatTypeData({required this.id, required this.name});
+
+  factory ChatTypeData.fromJson(Map<String, dynamic> json) {
+    return ChatTypeData(id: json['id'] as String, name: json['name'] as String);
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+}
+
+class MessageStatusData {
+  final String id;
+  final String name;
+
+  const MessageStatusData({required this.id, required this.name});
+
+  factory MessageStatusData.fromJson(Map<String, dynamic> json) {
+    return MessageStatusData(id: json['id'] as String, name: json['name'] as String);
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+}
+
+class AttachmentData {
+  final int id;
+  final String messageId;
+  final String url;
+
+  const AttachmentData({required this.id, required this.messageId, required this.url});
+
+  factory AttachmentData.fromJson(Map<String, dynamic> json) {
+    return AttachmentData(
+      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
+      messageId: json['messageId'] as String,
+      url: json['url'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'messageId': messageId, 'url': url};
+}
+
+class ScheduleData {
+  final int id;
+  final DateTime? createdAt;
+  final String ownerId;
+  final String title;
+  final DateTime start;
+  final DateTime end;
+  final String? note;
+  final String? messageId;
+
+  const ScheduleData({
+    required this.id,
+    this.createdAt,
+    required this.ownerId,
+    required this.title,
+    required this.start,
+    required this.end,
+    this.note,
+    this.messageId,
+  });
+
+  factory ScheduleData.fromJson(Map<String, dynamic> json) {
+    return ScheduleData(
+      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      ownerId: json['ownerId'] as String,
+      title: json['title'] as String,
+      start: DateTime.parse(json['start'] as String),
+      end: DateTime.parse(json['end'] as String),
+      note: json['note'] as String?,
+      messageId: json['messageId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'ownerId': ownerId,
+        'title': title,
+        'start': start.toIso8601String(),
+        'end': end.toIso8601String(),
+        'note': note,
+        'messageId': messageId,
+      };
+}
+
+class ScheduleMemberData {
+  final int id;
+  final DateTime? createdAt;
+  final int scheduleId;
+  final String memberId;
+  final String? responseId;
+
+  const ScheduleMemberData({
+    required this.id,
+    this.createdAt,
+    required this.scheduleId,
+    required this.memberId,
+    this.responseId,
+  });
+
+  factory ScheduleMemberData.fromJson(Map<String, dynamic> json) {
+    return ScheduleMemberData(
+      id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      scheduleId: json['scheduleId'] is int ? json['scheduleId'] as int : int.parse(json['scheduleId'].toString()),
+      memberId: json['memberId'] as String,
+      responseId: json['responseId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
+        'scheduleId': scheduleId,
+        'memberId': memberId,
+        'responseId': responseId,
+      };
+}
+
+class ScheduleMemberResponseData {
+  final String id;
+  final String name;
+
+  const ScheduleMemberResponseData({required this.id, required this.name});
+
+  factory ScheduleMemberResponseData.fromJson(Map<String, dynamic> json) {
+    return ScheduleMemberResponseData(id: json['id'] as String, name: json['name'] as String);
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
